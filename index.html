@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>집들이 초대장</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #251812;
+      --muted: #74645b;
+      --paper: rgba(255, 250, 242, 0.94);
+      --line: rgba(90, 62, 42, 0.18);
+      --accent: #d4482f;
+      --accent-dark: #9d2c1e;
+      --leaf: #2f7751;
+      --gold: #d59a2f;
+      --shadow: 0 24px 70px rgba(52, 32, 18, 0.24);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      font-family: Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+      color: var(--ink);
+      background: #fff8ee;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .cover {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(255, 209, 97, 0.28), transparent 28%),
+        radial-gradient(circle at 80% 10%, rgba(255, 122, 164, 0.2), transparent 26%),
+        #fff8ee;
+    }
+
+    .cover-inner {
+      width: min(560px, 100%);
+      display: grid;
+      gap: 14px;
+      justify-items: center;
+    }
+
+    .cover img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 86vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 18px 54px rgba(64, 43, 27, 0.16);
+      background: #fffaf3;
+    }
+
+    .scroll-cue {
+      border: 0;
+      background: transparent;
+      color: #5d4639;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 900;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 34px 18px;
+      background:
+        linear-gradient(180deg, rgba(255, 248, 238, 0.92), rgba(255, 248, 238, 0.92)),
+        radial-gradient(circle at 8% 12%, rgba(212, 72, 47, 0.16), transparent 26%),
+        radial-gradient(circle at 90% 20%, rgba(47, 119, 81, 0.13), transparent 24%);
+    }
+
+    .invite {
+      width: min(720px, 100%);
+      display: block;
+      background: var(--paper);
+      border: 1px solid rgba(255, 255, 255, 0.48);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border-radius: 8px;
+      backdrop-filter: blur(14px);
+    }
+
+    .content {
+      padding: 34px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .section {
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 22px;
+    }
+
+    .section:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .label {
+      margin: 0 0 10px;
+      color: var(--accent-dark);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .big {
+      margin: 0;
+      font-size: 25px;
+      font-weight: 850;
+      line-height: 1.35;
+    }
+
+    .muted {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin: 12px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .menu li {
+      padding: 8px 11px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.48);
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .actions {
+      position: relative;
+      min-height: 104px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding-top: 2px;
+    }
+
+    .btn {
+      min-width: 132px;
+      height: 54px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 900;
+      box-shadow: 0 12px 26px rgba(99, 48, 25, 0.15);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-yes {
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--gold));
+    }
+
+    .btn-yes:hover {
+      box-shadow: 0 16px 34px rgba(168, 65, 32, 0.28);
+    }
+
+    .btn-no {
+      position: relative;
+      color: #5a3b30;
+      background: #fff8ee;
+      border: 1px solid var(--line);
+    }
+
+    .form {
+      display: none;
+      gap: 12px;
+    }
+
+    .form.is-open {
+      display: grid;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field span {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--ink);
+      padding: 12px 13px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: rgba(212, 72, 47, 0.55);
+      box-shadow: 0 0 0 4px rgba(212, 72, 47, 0.12);
+    }
+
+    .submit {
+      width: 100%;
+      color: #fff;
+      background: var(--leaf);
+    }
+
+    .toast {
+      min-height: 24px;
+      color: var(--leaf);
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .tiny {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 780px) {
+      .page {
+        padding: 18px 12px 28px;
+      }
+
+      .invite {
+        border-radius: 8px;
+      }
+
+      .content {
+        padding: 28px 22px 34px;
+      }
+
+      .btn {
+        flex: 1 1 132px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="cover" aria-label="집들이 초대장 표지">
+    <div class="cover-inner">
+      <img src="housewarming-title-image-black.png" alt="집들이에 초대합니다" />
+      <button class="scroll-cue" type="button" id="scrollToDetails">아래로 내려서 참석 여부 남기기</button>
+    </div>
+  </section>
+
+  <main class="page">
+    <article class="invite" id="details">
+      <section class="content">
+        <div class="section">
+          <p class="label">메뉴</p>
+          <p class="muted" id="menuIntro">지금 생각 중인 메뉴입니다. 더 먹고 싶은 게 있으면 마음껏 적어주세요.</p>
+          <ul class="menu" id="menuList"></ul>
+        </div>
+
+        <div class="section">
+          <p class="label">시간</p>
+          <p class="big" id="timeText">2026년 00월 00일 토요일 오후 6시</p>
+          <p class="muted" id="placeText">장소는 초대받은 분께 따로 안내합니다.</p>
+        </div>
+
+        <div class="section" id="questionSection">
+          <p class="label">참석 여부</p>
+          <p class="big">참석하시겠습니까?</p>
+          <div class="actions" id="actions">
+            <button class="btn btn-yes" type="button" id="yesButton">예, 갑니다</button>
+            <button class="btn btn-no" type="button" id="noButton">아니오</button>
+          </div>
+        </div>
+
+        <form class="section form" id="rsvpForm">
+          <p class="label">참석 정보</p>
+          <label class="field">
+            <span>이름</span>
+            <input id="guestName" name="name" autocomplete="name" required />
+          </label>
+          <label class="field">
+            <span>먹고 싶은 메뉴</span>
+            <input id="wantedMenu" name="wantedMenu" placeholder="예: 보쌈, 떡볶이, 하이볼" />
+          </label>
+          <label class="field">
+            <span>건의사항</span>
+            <textarea id="note" name="note" placeholder="못 먹는 음식, 도착 시간, 선곡 신청 등"></textarea>
+          </label>
+          <button class="btn submit" type="submit">제출하기</button>
+          <div class="toast" id="toast" role="status" aria-live="polite"></div>
+          <p class="tiny" id="setupHint"></p>
+        </form>
+      </section>
+    </article>
+  </main>
+
+  <script>
+    const CONFIG = {
+      hostName: "상원",
+      title: "집들이에\n초대합니다",
+      intro: "편한 옷, 빈속, 좋은 기분만 챙겨오면 됩니다. 나머지는 제가 준비해둘게요.",
+      dateTime: "2026년 00월 00일 토요일 오후 6시",
+      place: "장소는 초대받은 분께 따로 안내합니다.",
+      menuIntro: "지금 생각 중인 메뉴입니다. 더 먹고 싶은 게 있으면 마음껏 적어주세요.",
+      menus: ["삼겹살", "보쌈", "떡볶이", "밀푀유나베", "파스타", "하이볼", "과일", "디저트"],
+      webAppUrl: ""
+    };
+
+    const byId = (id) => document.getElementById(id);
+
+    byId("timeText").textContent = CONFIG.dateTime;
+    byId("placeText").textContent = CONFIG.place;
+    byId("menuIntro").textContent = CONFIG.menuIntro;
+
+    byId("scrollToDetails").addEventListener("click", () => {
+      byId("details").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    const menuList = byId("menuList");
+    CONFIG.menus.forEach((item) => {
+      const li = document.createElement("li");
+      li.textContent = item;
+      menuList.appendChild(li);
+    });
+
+    const noButton = byId("noButton");
+    const actions = byId("actions");
+    let dodgeCount = 0;
+
+    function dodgeNoButton() {
+      const bounds = actions.getBoundingClientRect();
+      const buttonBounds = noButton.getBoundingClientRect();
+      const maxX = Math.max(0, bounds.width - buttonBounds.width);
+      const maxY = Math.max(0, bounds.height - buttonBounds.height);
+      const x = Math.round(Math.random() * maxX);
+      const y = Math.round(26 + Math.random() * Math.max(24, maxY));
+      noButton.style.position = "absolute";
+      noButton.style.left = `${x}px`;
+      noButton.style.top = `${Math.min(y, maxY)}px`;
+      dodgeCount += 1;
+      if (dodgeCount > 5) noButton.textContent = "그래도 안 됨";
+    }
+
+    noButton.addEventListener("mouseenter", dodgeNoButton);
+    noButton.addEventListener("focus", dodgeNoButton);
+    noButton.addEventListener("click", dodgeNoButton);
+    noButton.addEventListener("touchstart", (event) => {
+      event.preventDefault();
+      dodgeNoButton();
+    }, { passive: false });
+
+    byId("yesButton").addEventListener("click", () => {
+      byId("rsvpForm").classList.add("is-open");
+      byId("guestName").focus();
+      byId("questionSection").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    const params = new URLSearchParams(location.search);
+    const guestFromLink = params.get("guest");
+    if (guestFromLink) byId("guestName").value = guestFromLink;
+
+    const setupHint = byId("setupHint");
+    setupHint.textContent = CONFIG.webAppUrl
+      ? ""
+      : "현재는 테스트 모드입니다. Google Apps Script 배포 URL을 CONFIG.webAppUrl에 넣으면 응답이 시트에 저장됩니다.";
+
+    byId("rsvpForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const toast = byId("toast");
+      const payload = {
+        attending: "예",
+        name: byId("guestName").value.trim(),
+        wantedMenu: byId("wantedMenu").value.trim(),
+        note: byId("note").value.trim(),
+        guest: guestFromLink || "",
+        submittedAt: new Date().toISOString()
+      };
+
+      if (!payload.name) {
+        toast.textContent = "이름을 적어주세요.";
+        return;
+      }
+
+      toast.textContent = "제출 중입니다...";
+
+      if (!CONFIG.webAppUrl) {
+        const saved = JSON.parse(localStorage.getItem("housewarming-rsvp") || "[]");
+        saved.push(payload);
+        localStorage.setItem("housewarming-rsvp", JSON.stringify(saved));
+        toast.textContent = "테스트 저장 완료. 실제 공유 전에는 Apps Script URL을 설정해주세요.";
+        event.target.reset();
+        return;
+      }
+
+      try {
+        await fetch(CONFIG.webAppUrl, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        toast.textContent = "참석 응답 완료. 맛있는 걸로 준비해둘게요.";
+        event.target.reset();
+      } catch (error) {
+        toast.textContent = "제출이 막혔습니다. 잠시 후 다시 시도해주세요.";
+      }
+    });
+  </script>
+</body>
+</html>
