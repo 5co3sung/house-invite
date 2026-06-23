@@ -137,6 +137,22 @@
       line-height: 1.65;
     }
 
+    .countdown {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 16px 0 0;
+      padding: 12px 16px;
+      border: 1px dashed rgba(212, 72, 47, 0.45);
+      border-radius: 18px;
+      background: rgba(255, 238, 211, 0.72);
+      color: var(--accent-dark);
+      font-size: clamp(22px, 5vw, 31px);
+      font-weight: 700;
+      line-height: 1.35;
+      text-align: center;
+    }
+
     .menu {
       display: flex;
       flex-wrap: wrap;
@@ -295,8 +311,9 @@
 
         <div class="section">
           <p class="label">시간</p>
-          <p class="big" id="timeText">2026년 00월 00일 토요일 오후 6시</p>
+          <p class="big" id="timeText">2026년 7월 20일 월요일 오후 6시</p>
           <p class="muted" id="placeText">장소는 초대받은 분께 따로 안내합니다.</p>
+          <p class="countdown" id="countdownText" aria-live="polite"></p>
         </div>
 
         <div class="section" id="questionSection">
@@ -335,7 +352,8 @@
       hostName: "상원",
       title: "집들이에\n초대합니다",
       intro: "편한 옷, 빈속, 좋은 기분만 챙겨오면 됩니다. 나머지는 제가 준비해둘게요.",
-      dateTime: "2026년 00월 00일 토요일 오후 6시",
+      dateTime: "2026년 7월 20일 월요일 오후 6시",
+      eventDateTime: "2026-07-20T18:00:00+09:00",
       place: "장소는 초대받은 분께 따로 안내합니다.",
       menuIntro: "준비 예정 메뉴입니다. 더 먹고 싶은 메뉴가 있으면 참석 정보에 추천해주세요.",
       menus: ["항정수육", "감바스", "깻잎전"],
@@ -347,6 +365,27 @@
     byId("timeText").textContent = CONFIG.dateTime;
     byId("placeText").textContent = CONFIG.place;
     byId("menuIntro").textContent = CONFIG.menuIntro;
+
+    function updateCountdown() {
+      const target = new Date(CONFIG.eventDateTime).getTime();
+      const diff = target - Date.now();
+      const countdownText = byId("countdownText");
+
+      if (diff <= 0) {
+        countdownText.textContent = "오늘 집들이 날이에요!";
+        return;
+      }
+
+      const totalSeconds = Math.floor(diff / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      countdownText.textContent = `집들이까지 ${days}일 ${String(hours).padStart(2, "0")}시간 ${String(minutes).padStart(2, "0")}분 ${String(seconds).padStart(2, "0")}초 남았어요`;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
 
     byId("scrollToDetails").addEventListener("click", () => {
       byId("details").scrollIntoView({ behavior: "smooth", block: "start" });
