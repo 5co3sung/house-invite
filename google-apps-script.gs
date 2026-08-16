@@ -1,12 +1,5 @@
 function doPost(e) {
   const notifyEmail = "sangwon1564@naver.com";
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("응답")
-    || SpreadsheetApp.getActiveSpreadsheet().insertSheet("응답");
-
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(["접수시각", "참석", "이름", "먹고 싶은 메뉴", "건의사항", "개인링크이름", "브라우저시각"]);
-  }
-
   const data = JSON.parse(e.postData.contents || "{}");
   const subject = "[집들이 참석 응답] " + (data.name || "이름 미입력");
   const body = [
@@ -26,16 +19,6 @@ function doPost(e) {
     subject: subject,
     body: body
   });
-
-  sheet.appendRow([
-    new Date(),
-    data.attending || "",
-    data.name || "",
-    data.wantedMenu || "",
-    data.note || "",
-    data.guest || "",
-    data.submittedAt || ""
-  ]);
 
   return ContentService
     .createTextOutput(JSON.stringify({ ok: true }))
